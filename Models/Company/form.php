@@ -1,6 +1,6 @@
 <?php
 require $_SERVER["DOCUMENT_ROOT"] . '../Models/utils/form.php';
-function userFormIsValid(){
+function companyFormIsValid(){
     $errors = [];
 
 if(!empty(post('Send'))){
@@ -23,4 +23,3 @@ if(!empty(post('Send'))){
     return $errors;
 }
 }
-

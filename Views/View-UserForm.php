@@ -1,5 +1,13 @@
 <!DOCTYPE html>
-<?php require $_SERVER["DOCUMENT_ROOT"] . '../Models/User/form.php'; ?>
+<?php require $_SERVER["DOCUMENT_ROOT"] . '../Models/User/form.php'; 
+
+$ip = getIp();
+$ipString = str_replace('.', '_', $ip);
+$destinationCV = $_SERVER["DOCUMENT_ROOT"] . "uploads/Users/CV/$ipString";
+if(is_dir($destinationCV)){
+    header("location:Error-Controller.php");
+}
+?>
 <html>
     <head>
         <meta charset="UTF-8">

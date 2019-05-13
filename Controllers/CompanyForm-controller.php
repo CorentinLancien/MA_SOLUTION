@@ -2,7 +2,8 @@
 
 require $_SERVER["DOCUMENT_ROOT"] . '/../Views/Menu/View-Menu.php';
 require $_SERVER["DOCUMENT_ROOT"] . '../Views/View-CompanyForm.php';
-var_dump($_POST);
+
+$_POST;
 $Libelle = post('LastName');
 $Phone = post('Phone');
 $Adress = post('Adress');
@@ -13,42 +14,39 @@ $Date = date("Y-m-d");
 $Annonce_Id = $_GET['Id'];
 
 $ip = getIp();
-
 $ipString = str_replace('.', '_', $ip);
 $ipString;
 
-
+$errors = companyFormIsValid();
+$errorFind = 0;
 
 if(!empty(post('Send'))){
-   
-    
-    if($_FILES['Lettre'] != ''){
-        mkdir($destinationLettre, 0777);
-    }
-    move_uploaded_file($tmp_nameCV, "$destinationCV/$nameCV");
+		foreach ($errors as $error) {
+    	if($error != ''){
+        	$errorFind = 1;
+    	}
+		}
+}
 
-    $tmp_nameLettre = $_FILES["Lettre"]["tmp_name"];
-    $nameLettre = basename($_FILES["Lettre"]["name"]);
-    $destinationLettre = $_SERVER["DOCUMENT_ROOT"] . "uploads/Users/Lettres/";
+if(!empty(post('Send')) && $errorFind == 0){
 
-    move_uploaded_file($tmp_nameLettre, "$destinationLettre/$nameLettre");
-    
-    //Insert le particulier
+
+    //Insert la société
     $bdd = NewDB();
-    $insert = $bdd->prepare("INSERT INTO particulier(Nom, Prenom, Adresse, Telephone, Lettre, CV, Date_de_naissance, Email, Ip) VALUES('$LastName', '$FirstName', '$Adress', '$Phone', '$tmp_nameLettre', '$tmp_nameCV', '$Birthdate', '$Email' , '$Ip')");
+    $insert = $bdd->prepare("INSERT INTO societe(Libelle, Email,  Adresse, Telephone, Description) VALUES('$Libelle', '$Email', '$Adress', '$Phone', '$Description')");
     $insert->execute();
-    
-    //SELECT l'id du particulier créer avec l'INSERT précédent 
-  
-    $query = ("SELECT Identifiant FROM particulier ORDER BY Identifiant DESC LIMIT 1;");
+
+    //SELECT l'id de la société créer avec l'INSERT précédent
+
+    $query = ("SELECT Identifiant FROM societe ORDER BY Identifiant DESC LIMIT 1;");
     $result = $bdd->query($query);
-    
-    //Informations concernant l'annonce et le particulier qui y répond 
+
+    //Informations concernant l'annonce et la société qui y répond
     foreach($result as $item){
         $itemId = $item['Identifiant'];
-        $Message = $bdd->prepare("INSERT INTO annonce_particulier(Date_Candidature, Message, Identifiant_Annonces, Identifiant_Particulier) VALUES('$Date', '$Message' ,$Annonce_Id, $itemId)");
-        var_dump($Message->execute());
-        
+        $Message = $bdd->prepare("INSERT INTO annonce_societe(Date_de_demande, Message, Identifiant_Annonces, Identifiant_Societe) VALUES('$Date', '$Message' ,$Annonce_Id, $itemId)");
+        $Message->execute();
+
     }
 }
 
@@ -57,4 +55,3 @@ if(!empty(post('Send'))){
 
 
 require $_SERVER["DOCUMENT_ROOT"] . '../Views/Menu/View-Footer.php';
-

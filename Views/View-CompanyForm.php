@@ -19,7 +19,7 @@
                   '?>
             </div>
             <?php
-           $errors = userFormIsValid();
+           $errors = companyFormIsValid();
            if(!empty(post('Send'))){
              foreach ($errors as $error) {
                  echo $error;
